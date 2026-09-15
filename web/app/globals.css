@@ -25,3 +25,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes phone-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(181, 113, 75, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 18px rgba(181, 113, 75, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(181, 113, 75, 0);
+  }
+}
