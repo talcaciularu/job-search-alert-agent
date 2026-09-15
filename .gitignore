@@ -1,0 +1,15 @@
+# Real config with live secrets (Telegram bot token) and personal contact list.
+# Never commit this - only config.example.yaml (the sanitized template) is public.
+config.yaml
+
+# Runtime data - job-search history / scan logs. Excluded to avoid publishing
+# which companies/roles are being targeted and when.
+seen_jobs.json
+agent.log
+
+# Python / editor / env noise
+.venv/
+__pycache__/
+*.pyc
+.idea/
+.claude/

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Search Alert Agent</title>
+<meta name="description" content="A Python bot that scans career pages and job boards and pushes Telegram alerts for new matching jobs.">
+<style>
+  :root {
+    --bg: #f7f7f9;
+    --surface: #ffffff;
+    --text: #1c1c22;
+    --muted: #5b5b66;
+    --accent: #2f6feb;
+    --border: #e4e4ea;
+    --code-bg: #f0f1f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14141a;
+      --surface: #1c1c24;
+      --text: #ececf1;
+      --muted: #a3a3b0;
+      --accent: #6ea1ff;
+      --border: #2c2c36;
+      --code-bg: #22222c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 5rem;
+  }
+  header { margin-bottom: 2.5rem; }
+  .eyebrow {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    margin: 0 0 0.8rem;
+    letter-spacing: -0.02em;
+  }
+  .lead {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 60ch;
+  }
+  .cta {
+    display: inline-flex;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+  }
+  .btn.primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn.secondary {
+    color: var(--text);
+    background: var(--surface);
+  }
+  section { margin-top: 3rem; }
+  h2 {
+    font-size: 1.3rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+  }
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  .steps li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+  }
+  .steps li strong { display: block; margin-bottom: 0.2rem; }
+  .steps li span { color: var(--muted); font-size: 0.95rem; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.9rem;
+  }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.55rem 0.7rem;
+    border-bottom: 1px solid var(--border);
+  }
+  th { color: var(--muted); font-weight: 600; }
+  footer {
+    margin-top: 4rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+  }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Open source · Python</div>
+    <h1>Job Search Alert Agent</h1>
+    <p class="lead">
+      Scans career pages and job boards on a schedule, filters postings by
+      keyword, location and experience level, and sends a Telegram alert
+      the moment a genuinely new match shows up — so you stop refreshing
+      job boards by hand.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/REPLACE_OWNER/REPLACE_REPO" id="repo-link">View on GitHub</a>
+      <a class="btn secondary" href="#how-it-works">How it works</a>
+    </div>
+  </header>
+
+  <section id="how-it-works">
+    <h2>How it works</h2>
+    <ul class="steps">
+      <li>
+        <strong>1. Configure your sources</strong>
+        <span>Point it at any company careers page, or a job board with known result-list selectors (AllJobs, Drushim, etc.).</span>
+      </li>
+      <li>
+        <strong>2. Filter by keyword</strong>
+        <span>Only postings matching your target titles get through — with an exclude list for terms like "Senior" when you want junior roles, or vice versa.</span>
+      </li>
+      <li>
+        <strong>3. Optional location &amp; experience checks</strong>
+        <span>Skip postings outside your target locations, and flag ones that ask for more years of experience than you want to see.</span>
+      </li>
+      <li>
+        <strong>4. Deduplicated Telegram alerts</strong>
+        <span>Every new match is recorded so you're only ever notified once per listing — failed sends are retried automatically on the next run.</span>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Quick start</h2>
+    <pre><code>pip install -r requirements.txt
+cp config.example.yaml config.yaml
+# edit config.yaml with your Telegram bot token, keywords, and target sites
+python Job_agent.py</code></pre>
+    <p>Schedule it with cron or Windows Task Scheduler to run automatically, e.g. twice a day.</p>
+  </section>
+
+  <section>
+    <h2>Configuration</h2>
+    <table>
+      <tr><th>Key</th><th>Purpose</th></tr>
+      <tr><td><code>telegram</code></td><td>Bot token &amp; chat ID for alerts</td></tr>
+      <tr><td><code>keywords</code> / <code>exclude_keywords</code></td><td>Include/exclude filters on job titles</td></tr>
+      <tr><td><code>sites</code></td><td>Careers pages / job boards to scan</td></tr>
+      <tr><td><code>location_filter</code></td><td>Optional geographic filtering</td></tr>
+      <tr><td><code>experience_filter</code></td><td>Optional years-of-experience flagging</td></tr>
+    </table>
+  </section>
+
+  <footer>
+    Source on <a href="https://github.com/REPLACE_OWNER/REPLACE_REPO" id="repo-link-2">GitHub</a>. MIT licensed.
+  </footer>
+</div>
+</body>
+</html>
