@@ -1,70 +1,61 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Send } from "lucide-react";
+import { ArrowUpRight, CircleCheckBig, Send } from "lucide-react";
 
 const REPO_URL = "https://github.com/talcaciularu/job-search-alert-agent";
-const PROFILE_URL = "https://github.com/talcaciularu";
 
-const FRICTION = [
-  "Job boards are fragmented across a dozen open tabs",
-  "8+ hours a week lost to manual scrolling and re-checking",
-  "Strong roles get buried within hours of being posted",
-  "No consistent criteria — every scan is a fresh judgment call",
+const NOTIFICATION_BULLETS = [
+  "LiveOps ownership match",
+  "Cross-functional scope aligned",
+  "Fashion + gaming domain fit",
 ];
 
-const SOLUTION = [
-  "Headless scraping runs unattended, on a schedule, forever",
-  "One LLM-driven scorer applies the exact same criteria every time",
-  "New matches are formatted and dispatched the moment they're found",
-  "Zero manual triage — only genuine, ranked matches reach the inbox",
+const METRICS = [
+  { value: "100%", label: "Automated pipeline", dot: "#7C6FC2" },
+  { value: "<60s", label: "Latency, scrape to ping", dot: "#B5714B" },
+  { value: "0", label: "Duplicates ever delivered", dot: "#6B8F73" },
 ];
 
-const STEPS = [
+const PIPELINE = [
   {
-    n: "01",
-    title: "Ingestion",
-    body: "Scheduled polling across career pages and job-board APIs, normalized into a single structured feed — no manual refreshing required.",
+    title: "Polling",
+    tag: "PyCharm / Python script",
+    caption: "Scheduled checks across career pages and job-board APIs.",
   },
   {
-    n: "02",
-    title: "Evaluation",
-    body: "A structured prompt extracts seniority, role impact, and stack overlap, then scores fit against a defined profile — the same bar, applied consistently.",
+    title: "AI Evaluation",
+    tag: "Context & strict schema scoring",
+    caption: "Seniority, role impact, and stack overlap scored consistently.",
   },
   {
-    n: "03",
-    title: "Dispatch",
-    body: "Only new, high-fidelity matches are formatted and pushed — instantly, deduplicated, and never sent twice.",
+    title: "Push Dispatch",
+    tag: "Telegram Bot API",
+    caption: "Formatted, deduplicated alerts sent the moment a match clears the bar.",
   },
 ];
 
-const OUTCOMES = [
-  { value: "100%", label: "Automated", caption: "No manual triage required, start to finish." },
-  { value: "0", label: "Duplicates", caption: "Every match is deduplicated before it reaches you." },
-  { value: "<60s", label: "Alert latency", caption: "From detection to push notification." },
-];
+const MATCH_TARGET = 96;
 
-type Tone = "violet" | "rose" | "amber" | "emerald";
-
-const TONE_STYLES: Record<Tone, string> = {
-  violet: "bg-[#EFEBFA] text-[#6650A6]",
-  rose: "bg-[#FBEAF0] text-[#B04C74]",
-  amber: "bg-[#FBF1DE] text-[#A9761F]",
-  emerald: "bg-[#E9F5EE] text-[#3F8F5E]",
-};
-
-function Eyebrow({ tone, children }: { tone: Tone; children: string }) {
+function Bento({ className = "", children }: { className?: string; children: ReactNode }) {
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] ${TONE_STYLES[tone]}`}
+    <div
+      className={`rounded-[28px] border p-6 shadow-[0_1px_2px_rgba(28,28,30,0.04)] transition duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_16px_28px_-10px_rgba(28,28,30,0.14)] md:p-8 ${className}`}
     >
       {children}
-    </span>
+    </div>
   );
 }
 
-const MATCH_TARGET = 96;
+const metricsContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12 } },
+};
+const metricItem = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0 },
+};
 
 export default function Home() {
   const [pingKey, setPingKey] = useState(0);
@@ -111,254 +102,173 @@ export default function Home() {
   }, [pingKey]);
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] font-sans text-[#1B1A17]">
-      <div className="mx-auto max-w-6xl px-6 md:px-10">
-        {/* Folio */}
-        <div className="flex items-center justify-between pt-8 text-[11px] font-medium uppercase tracking-[0.2em] text-[#9C9686]">
-          <span>Case Study / 01</span>
-          <a
-            href={REPO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[#6B6558] transition-colors hover:text-[#1B1A17]"
-          >
-            GitHub
-            <ArrowUpRight className="h-3 w-3" />
-          </a>
-        </div>
-
-        {/* Hero */}
-        <section className="pb-24 pt-16 md:pb-32 md:pt-24">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#EAE8E3] px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-[#8A8578]">
-            Project Case Study &middot; Autonomous Workflows
-          </div>
-
-          <h1 className="mt-8 max-w-4xl font-serif text-4xl font-normal leading-[1.15] tracking-tight text-[#1B1A17] sm:text-5xl md:text-6xl">
-            Turning a manual hunt into an automated pipeline.
-          </h1>
-
-          <p className="mt-7 max-w-2xl text-lg leading-relaxed text-[#6B6558]">
-            Job boards are noisy and uncurated. Instead of endless manual scrolling, I built an
-            end-to-end Python &amp; AI agent that monitors listings, scores match fidelity, and
-            pushes instant alerts to Telegram.
-          </p>
-
-          <div className="mt-10 flex flex-wrap items-center gap-3">
-            <a
-              href={REPO_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-[#1B1A17] px-5 py-3 text-sm font-medium text-[#FAF9F6] transition-opacity hover:opacity-85"
-            >
-              View Code on GitHub
-              <ArrowUpRight className="h-4 w-4" />
-            </a>
-            <a
-              href="#architecture"
-              className="inline-flex items-center gap-2 rounded-full border border-[#EAE8E3] px-5 py-3 text-sm font-medium text-[#1B1A17] transition-colors hover:border-[#1B1A17]/30 hover:bg-white"
-            >
-              Explore Architecture
-              <ArrowDown className="h-4 w-4" />
-            </a>
-          </div>
-        </section>
-
-        {/* Friction vs Solution */}
-        <section className="border-t border-[#EAE8E3] py-20 md:py-28">
-          <Eyebrow tone="violet">The mindset</Eyebrow>
-          <h2 className="mt-4 max-w-lg font-serif text-2xl font-normal leading-snug text-[#1B1A17] sm:text-3xl">
-            Why I built it instead of living with it.
-          </h2>
-
-          <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-16">
+    <div className="min-h-screen bg-[#F9F9F8] font-sans text-[#1C1C1E]">
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+          {/* Card A — Hero / Narrative */}
+          <Bento className="flex h-full flex-col justify-between bg-[#F4F1EA] border-[#E8E4DA] md:col-span-2">
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-[#9C9686]">
-                The Friction
-              </h3>
-              <ul className="mt-5 space-y-4">
-                {FRICTION.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#6B6558]">
-                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#C9C3B4]" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="border-t border-[#EAE8E3] pt-10 md:border-t-0 md:border-l md:pl-16 md:pt-0">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-[#9C7A5C]">
-                The Builder Solution
-              </h3>
-              <ul className="mt-5 space-y-4">
-                {SOLUTION.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#1B1A17]">
-                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#B5714B]" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* Architecture */}
-        <section id="architecture" className="scroll-mt-16 border-t border-[#EAE8E3] py-20 md:py-28">
-          <Eyebrow tone="rose">The workflow</Eyebrow>
-          <h2 className="mt-4 max-w-lg font-serif text-2xl font-normal leading-snug text-[#1B1A17] sm:text-3xl">
-            Three quiet steps, running on their own.
-          </h2>
-
-          <div className="mt-14 grid gap-10 md:grid-cols-3 md:gap-0">
-            {STEPS.map((step, i) => (
-              <div
-                key={step.n}
-                className={`pt-8 md:pt-0 ${
-                  i > 0 ? "border-t border-[#EAE8E3] md:border-l md:border-t-0 md:pl-10" : ""
-                }`}
-              >
-                <span className="bg-gradient-to-br from-violet-500 via-fuchsia-400 to-amber-400 bg-clip-text font-serif text-4xl font-light text-transparent md:text-5xl">
-                  {step.n}
-                </span>
-                <h3 className="mt-4 text-base font-semibold text-[#1B1A17]">{step.title}</h3>
-                <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-[#6B6558]">
-                  {step.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Product in Action */}
-        <section className="border-t border-[#EAE8E3] py-20 md:py-28">
-          <Eyebrow tone="amber">The product, in action</Eyebrow>
-          <h2 className="mt-4 max-w-lg font-serif text-2xl font-normal leading-snug text-[#1B1A17] sm:text-3xl">
-            What actually lands on your phone.
-          </h2>
-
-          <div className="mt-14 grid gap-14 md:grid-cols-2 md:items-center md:gap-16">
-            <div>
-              <p className="max-w-md text-[15px] leading-relaxed text-[#6B6558]">
-                Every listing that clears the score threshold is dispatched as a single, focused
-                Telegram push — role, fit summary, and a direct link. No dashboard to check, no
-                digest to skim through later.
+              <span className="inline-flex items-center rounded-full border border-[#DAD4C4] bg-white/50 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-[#6B6558]">
+                Project Case Study &middot; Autonomous Workflows
+              </span>
+              <h1 className="mt-6 font-serif text-3xl font-normal leading-[1.15] tracking-tight text-[#1C1C1E] sm:text-4xl md:text-[2.75rem]">
+                Turning a manual hunt into an automated pipeline.
+              </h1>
+              <p className="mt-5 max-w-md text-[15px] leading-relaxed text-[#5C574C]">
+                Job boards are noisy, repetitive, and allergic to good UX. So I built a small
+                Python agent that handles the boring part — scanning, scoring, and pinging —
+                while I do literally anything else.
               </p>
+            </div>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                href={REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-[#1C1C1E] px-5 py-3 text-sm font-medium text-[#F9F9F8] transition-opacity hover:opacity-85"
+              >
+                View Code on GitHub
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+              <span className="inline-flex items-center rounded-full border border-[#DAD4C4] bg-white/40 px-4 py-2.5 text-xs font-medium text-[#6B6558]">
+                Stack: Python &middot; LLM &middot; Telegram
+              </span>
+            </div>
+          </Bento>
+
+          {/* Card B — Animated Notification */}
+          <Bento className="flex h-full flex-col bg-[#F3F0F8] border-[#E4DEF0]">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#7A6FA0]">
+                Live Preview
+              </span>
               <button
                 onClick={handleManualPing}
-                className="mt-8 inline-flex items-center gap-2 rounded-full border border-[#EAE8E3] bg-white px-5 py-3 text-sm font-medium text-[#1B1A17] transition-colors hover:border-[#1B1A17]/30 hover:bg-[#FDFCFA]"
+                className="inline-flex items-center gap-1 rounded-full border border-[#D9D0EE] bg-white/60 px-2.5 py-1 text-[11px] font-medium text-[#5B4F94] transition-colors hover:bg-white"
               >
-                Simulate New Match Ping
+                Trigger Ping
                 <span aria-hidden>⚡</span>
               </button>
             </div>
 
-            <div className="relative mx-auto w-full max-w-xs">
-              <div
-                aria-hidden
-                className="absolute -inset-10 -z-10 rounded-[3rem] bg-gradient-to-br from-violet-500/10 via-rose-500/5 to-amber-500/10 blur-3xl"
-              />
-              <div
-                className={`relative rounded-[2.5rem] border border-[#EAE8E3] bg-gradient-to-b from-white to-[#F5F3EE] p-3 shadow-[0_30px_60px_-24px_rgba(27,26,23,0.18)] ${
-                  isPulsing ? "animate-[phone-pulse_0.9s_ease-out]" : ""
-                }`}
-              >
-                <div className="rounded-[2rem] bg-[#FAF9F6] px-4 pb-8 pt-7">
-                  <div className="mx-auto mb-6 h-1 w-10 rounded-full bg-[#EAE8E3]" />
-
-                  <motion.div
-                    key={pingKey}
-                    initial={{ opacity: 0, y: -16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                    className="rounded-2xl border border-[#EAE8E3] bg-white/95 p-4 shadow-[0_8px_24px_rgba(27,26,23,0.08)]"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2AABEE]">
-                          <Send className="h-2.5 w-2.5 text-white" />
-                        </span>
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[#8A8578]">
-                          Telegram
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-[#A39C8C]">now</span>
-                    </div>
-
-                    <div className="mt-3 flex items-start justify-between gap-2">
-                      <p className="text-sm font-semibold text-[#1B1A17]">LiveOps Manager</p>
-                      <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 shadow-[0_0_18px_rgba(52,211,153,0.35)]">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                        {matchPercent}% Match
-                      </span>
-                    </div>
-                    <p className="mt-1 text-xs text-[#8A8578]">Highlight &middot; Remote &middot; $95K–120K</p>
-                    <p className="mt-2 text-xs leading-relaxed text-[#6B6558]">
-                      Strong overlap: LiveOps ownership, cross-functional launches, and
-                      data-driven event cadence.
-                    </p>
-                    <p className="mt-2 text-xs font-medium text-[#B5714B]">View listing ↗</p>
-                  </motion.div>
-                </div>
+            <div className="mt-6 flex flex-1 items-center justify-center">
+              <div className={`w-full ${isPulsing ? "animate-[bento-pulse_0.9s_ease-out]" : ""}`}>
+                <motion.div
+                  key={pingKey}
+                  initial={{ opacity: 0, y: -14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                  className="rounded-2xl border border-[#E4DEF0] bg-white/95 p-4 shadow-[0_10px_30px_-12px_rgba(91,79,148,0.25)]"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2AABEE]">
+                      <Send className="h-2.5 w-2.5 text-white" />
+                    </span>
+                    <span className="text-[11px] font-semibold text-[#6B6558]">
+                      Telegram &middot; Just now
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm font-semibold leading-snug text-[#1C1C1E]">
+                    🎯 {matchPercent}% Match: LiveOps Manager at Highlight
+                  </p>
+                  <ul className="mt-3 space-y-1.5">
+                    {NOTIFICATION_BULLETS.map((b) => (
+                      <li key={b} className="flex items-center gap-1.5 text-xs text-[#6B6558]">
+                        <CircleCheckBig className="h-3 w-3 shrink-0 text-emerald-500" />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
               </div>
             </div>
-          </div>
+          </Bento>
 
-          <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-[#EAE8E3] bg-[#EAE8E3] sm:grid-cols-3">
-            {OUTCOMES.map((outcome) => (
-              <div key={outcome.label} className="bg-[#FDFCFA] p-7">
-                <p className="font-serif text-3xl font-normal text-[#1B1A17]">{outcome.value}</p>
-                <p className="mt-1 text-sm font-semibold text-[#1B1A17]">{outcome.label}</p>
-                <p className="mt-2 text-[13px] leading-relaxed text-[#8A8578]">{outcome.caption}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+          {/* Card C — Mindset / Builder Quote */}
+          <Bento className="flex h-full flex-col justify-between bg-[#EFF5F0] border-[#DCE8DE]">
+            <div>
+              <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#5E7A63]">
+                The mindset
+              </span>
+              <p className="mt-4 font-serif text-xl italic leading-snug text-[#1C1C1E] sm:text-[1.35rem]">
+                &ldquo;When a process is slow or manual, you don&rsquo;t open a ticket. You build
+                the script that kills it.&rdquo;
+              </p>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-white/60 px-3 py-1.5 text-xs font-medium text-[#8A8578] line-through decoration-[#C9C3B4]">
+                Manual: 8h/week lost
+              </span>
+              <span className="text-xs text-[#9C9686]">vs</span>
+              <span className="rounded-full bg-[#5E7A63] px-3 py-1.5 text-xs font-medium text-white">
+                Agent: 0 manual triage
+              </span>
+            </div>
+          </Bento>
 
-        {/* About & Connect */}
-        <section className="border-t border-[#EAE8E3] py-20 md:py-28">
-          <Eyebrow tone="emerald">About the builder</Eyebrow>
-          <p className="mt-5 max-w-2xl font-serif text-xl font-normal leading-relaxed text-[#1B1A17] sm:text-2xl">
-            I build tools when something feels slower than it should be.
-          </p>
-          <p className="mt-6 max-w-2xl text-[15px] leading-relaxed text-[#6B6558]">
-            This project paired data rigor with a bit of design taste: a scraper that never
-            sleeps, a scoring layer that thinks in structured criteria, and a delivery mechanism
-            built for zero friction. It&rsquo;s a small system, but it&rsquo;s exactly the kind of
-            thing I like shipping — end to end, fast, and considered down to the notification
-            copy.
-          </p>
+          {/* Card D — Metrics & Impact */}
+          <Bento className="bg-[#FDF1EC] border-[#F6DDD3]">
+            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#B0714E]">
+              Metrics &amp; impact
+            </span>
+            <motion.div
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.5 }}
+              variants={metricsContainer}
+              className="mt-5 space-y-4"
+            >
+              {METRICS.map((m) => (
+                <motion.div key={m.label} variants={metricItem} className="flex items-baseline gap-3">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: m.dot }} />
+                  <span className="font-serif text-2xl text-[#1C1C1E]">{m.value}</span>
+                  <span className="text-xs text-[#8A6650]">{m.label}</span>
+                </motion.div>
+              ))}
+            </motion.div>
+          </Bento>
 
-          <div className="mt-9 flex flex-wrap items-center gap-3">
+          {/* Card E — Live Architecture Stream */}
+          <Bento className="bg-[#EFF4F9] border-[#DBE6F2]">
+            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#4F6E94]">
+              Live architecture
+            </span>
+            <div className="mt-5">
+              {PIPELINE.map((step, i) => (
+                <div key={step.title} className="relative flex gap-3 pb-6 last:pb-0">
+                  {i < PIPELINE.length - 1 && (
+                    <span className="absolute left-[5px] top-3 h-full w-px bg-[#C9D8E8]" />
+                  )}
+                  <span className="relative z-10 mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#4F6E94]" />
+                  <div>
+                    <p className="text-sm font-semibold text-[#1C1C1E]">{step.title}</p>
+                    <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-[#7C93AC]">
+                      {step.tag}
+                    </p>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#6B7C8F]">{step.caption}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Bento>
+
+          {/* Row 3 — Footer Banner */}
+          <Bento className="flex flex-col items-start justify-between gap-4 bg-[#1C1C1E] border-[#1C1C1E] sm:flex-row sm:items-center md:col-span-3">
+            <p className="text-sm text-[#F9F9F8]">
+              Built by <span className="font-semibold">Tal Caciularu</span> — bridging operations,
+              data, and design.
+            </p>
             <a
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-[#1B1A17] px-5 py-3 text-sm font-medium text-[#FAF9F6] transition-opacity hover:opacity-85"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-medium text-[#F9F9F8] transition-colors hover:bg-white/10"
             >
-              View the Repository
-              <ArrowUpRight className="h-4 w-4" />
+              View Repository
+              <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
-            <a
-              href={PROFILE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-[#EAE8E3] px-5 py-3 text-sm font-medium text-[#1B1A17] transition-colors hover:border-[#1B1A17]/30 hover:bg-white"
-            >
-              Let&rsquo;s Connect
-              <ArrowUpRight className="h-4 w-4" />
-            </a>
-          </div>
-        </section>
-
-        <footer className="flex flex-col gap-2 border-t border-[#EAE8E3] py-10 text-xs text-[#9C9686] sm:flex-row sm:items-center sm:justify-between">
-          <span>Built end-to-end with Python, an LLM scoring layer, and the Telegram Bot API.</span>
-          <a
-            href={REPO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#6B6558] underline decoration-[#D9D3C7] underline-offset-4 hover:text-[#1B1A17]"
-          >
-            View source on GitHub ↗
-          </a>
-        </footer>
+          </Bento>
+        </div>
       </div>
     </div>
   );
