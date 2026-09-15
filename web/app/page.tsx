@@ -16,7 +16,7 @@ const FRICTION = [
 
 const SOLUTION = [
   "Headless scraping runs unattended, on a schedule, forever",
-  "One LLM-driven scorer applies the exact same criteria every time",
+  "One keyword-and-rules filter applies the exact same criteria every time",
   "New matches are formatted and dispatched the moment they're found",
   "Zero manual triage — only genuine, ranked matches reach the inbox",
 ];
@@ -30,7 +30,7 @@ const STEPS = [
   {
     n: "02",
     title: "Evaluation",
-    body: "A structured prompt extracts seniority, role impact, and stack overlap, scoring fit against a defined profile.",
+    body: "Every listing is checked against keyword, location, and experience-year rules — the same bar, applied consistently every run.",
   },
   {
     n: "03",
@@ -47,13 +47,26 @@ const METRICS = [
 
 const NOTIFICATIONS = [
   {
-    icon: "🎯",
-    percent: 96,
-    role: "LiveOps Manager @ Highlight",
-    sub: "Highlighting in-game economy & live events",
+    title: "LiveOps Manager",
+    source: "Highlight – Careers",
+    location: "Remote (US)",
+    experience: "3+ yrs required",
+    experienceWarning: false,
   },
-  { icon: "✨", percent: 89, role: "Product & Operations Specialist", sub: null },
-  { icon: "📌", percent: 84, role: "Data & Workflow Specialist", sub: null },
+  {
+    title: "Product Analyst",
+    source: "Optimove",
+    location: "Tel Aviv, IL",
+    experience: null,
+    experienceWarning: false,
+  },
+  {
+    title: "Business Analyst",
+    source: "AllJobs",
+    location: null,
+    experience: "6+ yrs (above your target)",
+    experienceWarning: true,
+  },
 ] as const;
 
 type Phase = "polling" | "evaluating" | "done";
@@ -106,9 +119,9 @@ export default function Home() {
 
             <p className="mt-5 max-w-lg text-lg leading-relaxed text-[#5C574C]">
               Job boards are noisy, repetitive, and built for endless scrolling — not for finding
-              the one role that actually fits. So I replaced the scrolling with a Python &amp; AI
-              agent that watches the listings, scores every one against a defined bar, and pings
-              me only when something genuinely clears it.
+              the one role that actually fits. So I replaced the scrolling with a Python agent
+              that watches the listings, checks every one against a defined set of rules, and
+              pings me only when something genuinely clears the bar.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-6">
@@ -185,19 +198,25 @@ export default function Home() {
                               Telegram
                             </span>
                           </div>
-                          <div className="mt-1.5 flex items-center gap-1.5">
-                            <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-800">
-                              {n.icon} {n.percent}%
-                            </span>
-                            <span className="text-[11px] font-semibold leading-snug text-[#1A1A1A]">
-                              {n.role}
-                            </span>
-                          </div>
-                          {n.sub && (
-                            <span className="mt-1 inline-flex rounded-full bg-purple-50 px-2 py-0.5 text-[9px] font-medium text-purple-700">
-                              {n.sub}
-                            </span>
+                          {n.experience && (
+                            <p
+                              className={`mt-1.5 text-[10px] font-medium ${
+                                n.experienceWarning ? "text-purple-700" : "text-[#6B6558]"
+                              }`}
+                            >
+                              {n.experienceWarning ? "⚠️" : "🧑‍💻"} {n.experience}
+                            </p>
                           )}
+                          <p className="mt-1 text-[12px] font-semibold leading-snug text-[#1A1A1A]">
+                            💼 {n.title}
+                          </p>
+                          <p className="mt-0.5 text-[10px] text-[#8A8578]">📍 {n.source}</p>
+                          {n.location && (
+                            <p className="text-[10px] text-[#8A8578]">🏙️ {n.location}</p>
+                          )}
+                          <span className="mt-1 inline-flex rounded-full bg-purple-50 px-2 py-0.5 text-[9px] font-medium text-purple-700">
+                            🔗 View posting
+                          </span>
                         </motion.div>
                       ))}
                     </div>
@@ -298,9 +317,9 @@ export default function Home() {
           </p>
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#5C574C]">
             This project paired data rigor with a bit of design taste: a scraper that never
-            sleeps, a scoring layer that thinks in structured criteria, and a delivery mechanism
-            built for zero friction — end to end, fast, and considered down to the notification
-            copy.
+            sleeps, a filtering layer built on the same keyword and rule criteria every time, and
+            a delivery mechanism built for zero friction — end to end, fast, and considered down
+            to the notification copy.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
