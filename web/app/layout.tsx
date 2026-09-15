@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Job Search Alert Agent",
+  title: "CareerPulse — Job Search Alert Agent",
   description:
-    "A self-hosted Python bot that scans career pages, scores listings with AI, and sends Telegram alerts for genuine matches.",
+    "A LiveOps-style dashboard for a self-hosted job-search agent: scans career pages, scores listings with AI, and dispatches Telegram alerts for genuine matches.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
