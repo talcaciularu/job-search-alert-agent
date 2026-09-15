@@ -73,7 +73,7 @@ type Phase = "polling" | "evaluating" | "done";
 
 function Eyebrow({ children }: { children: string }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-purple-200/60 bg-purple-50 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-purple-900">
+    <span className="inline-flex items-center rounded-full border border-[#D5E4AC]/60 bg-[#EBF3D3] px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-[#5C7424]">
       {children}
     </span>
   );
@@ -156,8 +156,8 @@ export default function Home() {
                       {phase === "polling" && (
                         <>
                           <span className="relative flex h-1.5 w-1.5">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-purple-400 opacity-70" />
-                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-purple-400" />
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#5C7424] opacity-70" />
+                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#5C7424]" />
                           </span>
                           Agent running &middot; Polling career pages...
                         </>
@@ -168,7 +168,7 @@ export default function Home() {
                           <div className="h-0.5 w-full overflow-hidden rounded-full bg-[#EAE5DA]">
                             <motion.div
                               key={runToken}
-                              className="h-full rounded-full bg-purple-400"
+                              className="h-full rounded-full bg-[#5C7424]"
                               initial={{ width: "0%" }}
                               animate={{ width: "100%" }}
                               transition={{ duration: 1.05, ease: "easeInOut" }}
@@ -177,7 +177,7 @@ export default function Home() {
                         </div>
                       )}
                       {phase === "done" && (
-                        <span className="text-purple-700">&#10003; 3 matches found</span>
+                        <span className="text-[#5C7424]">&#10003; 3 matches found</span>
                       )}
                     </div>
 
@@ -201,7 +201,7 @@ export default function Home() {
                           {n.experience && (
                             <p
                               className={`mt-1.5 text-[10px] font-medium ${
-                                n.experienceWarning ? "text-purple-700" : "text-[#6B6558]"
+                                n.experienceWarning ? "text-[#5C7424]" : "text-[#6B6558]"
                               }`}
                             >
                               {n.experienceWarning ? "⚠️" : "🧑‍💻"} {n.experience}
@@ -214,7 +214,7 @@ export default function Home() {
                           {n.location && (
                             <p className="text-[10px] text-[#8A8578]">🏙️ {n.location}</p>
                           )}
-                          <span className="mt-1 inline-flex rounded-full bg-purple-50 px-2 py-0.5 text-[9px] font-medium text-purple-700">
+                          <span className="mt-1 inline-flex rounded-full bg-[#EBF3D3] px-2 py-0.5 text-[9px] font-medium text-[#374812]">
                             🔗 View posting
                           </span>
                         </motion.div>
@@ -227,7 +227,7 @@ export default function Home() {
 
             <button
               onClick={runSimulation}
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] bg-white px-5 py-2.5 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-purple-200 hover:bg-purple-50 hover:text-purple-900"
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] bg-white px-5 py-2.5 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-[#D5E4AC] hover:bg-[#EBF3D3] hover:text-[#5C7424]"
             >
               Re-run Agent Simulation
               <span aria-hidden>⚡</span>
@@ -250,20 +250,20 @@ export default function Home() {
               <ul className="mt-4 space-y-3">
                 {FRICTION.map((item) => (
                   <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#5C574C]">
-                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-purple-300" />
+                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#5C7424]" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-3xl border border-purple-200 bg-purple-50/30 p-8 shadow-[0_0_0_1px_rgba(196,181,253,0.15),0_20px_36px_-24px_rgba(139,92,246,0.25)]">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-purple-700">
+            <div className="rounded-3xl border border-[#D5E4AC] bg-[#EBF3D3]/30 p-8 shadow-[0_0_0_1px_rgba(213,228,172,0.35),0_20px_36px_-24px_rgba(92,116,36,0.25)]">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-[#5C7424]">
                 The Builder Solution
               </h3>
               <ul className="mt-4 space-y-3">
                 {SOLUTION.map((item) => (
                   <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#5C574C]">
-                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-purple-300" />
+                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#5C7424]" />
                     {item}
                   </li>
                 ))}
@@ -287,7 +287,7 @@ export default function Home() {
                   i > 0 ? "border-t border-[#EAE5DA] lg:border-l lg:border-t-0 lg:pl-12" : ""
                 }`}
               >
-                <span className="font-serif text-4xl font-light text-purple-300 lg:text-5xl">
+                <span className="font-serif text-4xl font-light text-[#5C7424] lg:text-5xl">
                   {step.n}
                 </span>
                 <h3 className="mt-3 text-base font-semibold text-[#1A1A1A]">{step.title}</h3>
@@ -336,7 +336,7 @@ export default function Home() {
               href={PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] px-5 py-3 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-purple-200 hover:bg-purple-50 hover:text-purple-900"
+              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] px-5 py-3 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-[#D5E4AC] hover:bg-[#EBF3D3] hover:text-[#5C7424]"
             >
               Let&rsquo;s Connect
               <ArrowUpRight className="h-4 w-4" />
