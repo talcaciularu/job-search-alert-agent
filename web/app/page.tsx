@@ -1,274 +1,340 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, CircleCheckBig, Send } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Send } from "lucide-react";
 
 const REPO_URL = "https://github.com/talcaciularu/job-search-alert-agent";
+const PROFILE_URL = "https://github.com/talcaciularu";
 
-const NOTIFICATION_BULLETS = [
-  "LiveOps ownership match",
-  "Cross-functional scope aligned",
-  "Fashion + gaming domain fit",
+const FRICTION = [
+  "Job boards are fragmented across a dozen open tabs",
+  "8+ hours a week lost to manual scrolling and re-checking",
+  "Strong roles get buried within hours of being posted",
+  "No consistent criteria — every scan is a fresh judgment call",
+];
+
+const SOLUTION = [
+  "Headless scraping runs unattended, on a schedule, forever",
+  "One LLM-driven scorer applies the exact same criteria every time",
+  "New matches are formatted and dispatched the moment they're found",
+  "Zero manual triage — only genuine, ranked matches reach the inbox",
+];
+
+const STEPS = [
+  {
+    n: "01",
+    color: "#B5714B",
+    title: "Ingestion",
+    body: "Scheduled polling across career pages and job-board APIs, normalized into a single structured feed.",
+  },
+  {
+    n: "02",
+    color: "#7A8F72",
+    title: "Evaluation",
+    body: "A structured prompt extracts seniority, role impact, and stack overlap, scoring fit against a defined profile.",
+  },
+  {
+    n: "03",
+    color: "#8C7FB0",
+    title: "Dispatch",
+    body: "Only new, high-fidelity matches are formatted and pushed — instantly, deduplicated, never sent twice.",
+  },
 ];
 
 const METRICS = [
-  { value: "100%", label: "Automated pipeline", dot: "#7C6FC2" },
-  { value: "<60s", label: "Latency, scrape to ping", dot: "#B5714B" },
-  { value: "0", label: "Duplicates ever delivered", dot: "#6B8F73" },
+  { value: "<60s", label: "Alert latency, scrape to ping" },
+  { value: "100%", label: "Automated, start to finish" },
+  { value: "0", label: "Noise — every match earns its place" },
 ];
 
-const PIPELINE = [
+const NOTIFICATIONS = [
   {
-    title: "Polling",
-    tag: "PyCharm / Python script",
-    caption: "Scheduled checks across career pages and job-board APIs.",
+    icon: "🎯",
+    text: "96% Match — LiveOps Manager @ Highlight",
+    sub: "Highlighting in-game economy & live events",
   },
-  {
-    title: "AI Evaluation",
-    tag: "Context & strict schema scoring",
-    caption: "Seniority, role impact, and stack overlap scored consistently.",
-  },
-  {
-    title: "Push Dispatch",
-    tag: "Telegram Bot API",
-    caption: "Formatted, deduplicated alerts sent the moment a match clears the bar.",
-  },
-];
+  { icon: "✨", text: "89% Match — Product & Operations Specialist", sub: null },
+  { icon: "📌", text: "84% Match — Data & Workflow Specialist", sub: null },
+] as const;
 
-const MATCH_TARGET = 96;
-
-function Bento({ className = "", children }: { className?: string; children: ReactNode }) {
-  return (
-    <div
-      className={`rounded-[28px] border p-6 shadow-[0_1px_2px_rgba(28,28,30,0.04)] transition duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_16px_28px_-10px_rgba(28,28,30,0.14)] md:p-8 ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
-
-const metricsContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.12 } },
-};
-const metricItem = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0 },
-};
+type Phase = "polling" | "evaluating" | "done";
 
 export default function Home() {
-  const [pingKey, setPingKey] = useState(0);
-  const [matchPercent, setMatchPercent] = useState(0);
-  const [isPulsing, setIsPulsing] = useState(false);
-  const loopRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [runToken, setRunToken] = useState(0);
+  const [phase, setPhase] = useState<Phase>("polling");
+  const [visibleCount, setVisibleCount] = useState(0);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  function scheduleLoop() {
-    if (loopRef.current) clearInterval(loopRef.current);
-    loopRef.current = setInterval(() => {
-      setPingKey((k) => k + 1);
-    }, 6000);
-  }
-
-  function handleManualPing() {
-    setPingKey((k) => k + 1);
-    scheduleLoop();
+  function runSimulation() {
+    setRunToken((k) => k + 1);
   }
 
   useEffect(() => {
-    scheduleLoop();
-    return () => {
-      if (loopRef.current) clearInterval(loopRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    setPhase("polling");
+    setVisibleCount(0);
 
-  useEffect(() => {
-    setMatchPercent(0);
-    setIsPulsing(true);
-    const pulseTimeout = setTimeout(() => setIsPulsing(false), 900);
+    timers.current.push(setTimeout(() => setPhase("evaluating"), 1100));
+    timers.current.push(setTimeout(() => setPhase("done"), 2200));
+    timers.current.push(setTimeout(() => setVisibleCount(1), 2350));
+    timers.current.push(setTimeout(() => setVisibleCount(2), 3050));
+    timers.current.push(setTimeout(() => setVisibleCount(3), 3750));
 
-    let current = 0;
-    const countInterval = setInterval(() => {
-      current = Math.min(MATCH_TARGET, current + 4);
-      setMatchPercent(current);
-      if (current >= MATCH_TARGET) clearInterval(countInterval);
-    }, 18);
-
-    return () => {
-      clearInterval(countInterval);
-      clearTimeout(pulseTimeout);
-    };
-  }, [pingKey]);
+    return () => timers.current.forEach(clearTimeout);
+  }, [runToken]);
 
   return (
-    <div className="min-h-screen bg-[#F9F9F8] font-sans text-[#1C1C1E]">
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
-          {/* Card A — Hero / Narrative */}
-          <Bento className="flex h-full flex-col justify-between bg-[#F4F1EA] border-[#E8E4DA] md:col-span-2">
-            <div>
-              <span className="inline-flex items-center rounded-full border border-[#DAD4C4] bg-white/50 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-[#6B6558]">
-                Project Case Study &middot; Autonomous Workflows
-              </span>
-              <h1 className="mt-6 font-serif text-3xl font-normal leading-[1.15] tracking-tight text-[#1C1C1E] sm:text-4xl md:text-[2.75rem]">
-                Turning a manual hunt into an automated pipeline.
-              </h1>
-              <p className="mt-5 max-w-md text-[15px] leading-relaxed text-[#5C574C]">
-                Job boards are noisy, repetitive, and allergic to good UX. So I built a small
-                Python agent that handles the boring part — scanning, scoring, and pinging —
-                while I do literally anything else.
-              </p>
-            </div>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+    <div className="min-h-screen bg-[#FAF8F5] font-sans text-[#1A1A1A]">
+      <div className="mx-auto max-w-7xl px-8 py-10 lg:px-12">
+        {/* Hero */}
+        <section className="grid gap-16 pb-24 pt-10 lg:grid-cols-2 lg:items-center lg:pb-32 lg:pt-16">
+          {/* Left: story */}
+          <div>
+            <span className="inline-flex items-center rounded-full border border-[#E5DFD3] px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-[#8A8578]">
+              Project Case Study &middot; Autonomous Workflows
+            </span>
+
+            <h1 className="mt-7 font-serif text-4xl font-semibold leading-[1.12] tracking-tight text-[#1A1A1A] sm:text-5xl md:text-[3.25rem]">
+              Turning a manual hunt into an automated pipeline.
+            </h1>
+
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#5C574C]">
+              Job boards are noisy, repetitive, and built for endless scrolling — not for finding
+              the one role that actually fits. So I replaced the scrolling with a Python &amp; AI
+              agent that watches the listings, scores every one against a defined bar, and pings
+              me only when something genuinely clears it.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center gap-6">
               <a
                 href={REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-[#1C1C1E] px-5 py-3 text-sm font-medium text-[#F9F9F8] transition-opacity hover:opacity-85"
+                className="inline-flex items-center gap-2 rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-medium text-[#FAF8F5] transition-opacity hover:opacity-85"
               >
                 View Code on GitHub
                 <ArrowUpRight className="h-4 w-4" />
               </a>
-              <span className="inline-flex items-center rounded-full border border-[#DAD4C4] bg-white/40 px-4 py-2.5 text-xs font-medium text-[#6B6558]">
-                Stack: Python &middot; LLM &middot; Telegram
-              </span>
-            </div>
-          </Bento>
-
-          {/* Card B — Animated Notification */}
-          <Bento className="flex h-full flex-col bg-[#F3F0F8] border-[#E4DEF0]">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#7A6FA0]">
-                Live Preview
-              </span>
-              <button
-                onClick={handleManualPing}
-                className="inline-flex items-center gap-1 rounded-full border border-[#D9D0EE] bg-white/60 px-2.5 py-1 text-[11px] font-medium text-[#5B4F94] transition-colors hover:bg-white"
+              <a
+                href="#architecture"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#1A1A1A] underline decoration-[#D9D3C7] underline-offset-4 transition-colors hover:decoration-[#1A1A1A]"
               >
-                Trigger Ping
-                <span aria-hidden>⚡</span>
-              </button>
+                Explore Architecture
+                <ArrowDown className="h-4 w-4" />
+              </a>
             </div>
+          </div>
 
-            <div className="mt-6 flex flex-1 items-center justify-center">
-              <div className={`w-full ${isPulsing ? "animate-[bento-pulse_0.9s_ease-out]" : ""}`}>
-                <motion.div
-                  key={pingKey}
-                  initial={{ opacity: 0, y: -14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                  className="rounded-2xl border border-[#E4DEF0] bg-white/95 p-4 shadow-[0_10px_30px_-12px_rgba(91,79,148,0.25)]"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2AABEE]">
-                      <Send className="h-2.5 w-2.5 text-white" />
-                    </span>
-                    <span className="text-[11px] font-semibold text-[#6B6558]">
-                      Telegram &middot; Just now
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold leading-snug text-[#1C1C1E]">
-                    🎯 {matchPercent}% Match: LiveOps Manager at Highlight
-                  </p>
-                  <ul className="mt-3 space-y-1.5">
-                    {NOTIFICATION_BULLETS.map((b) => (
-                      <li key={b} className="flex items-center gap-1.5 text-xs text-[#6B6558]">
-                        <CircleCheckBig className="h-3 w-3 shrink-0 text-emerald-500" />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              </div>
-            </div>
-          </Bento>
+          {/* Right: iPhone simulation */}
+          <div className="flex flex-col items-center">
+            <div className="relative w-[280px] sm:w-[300px]">
+              <div className="rounded-[3rem] border-[10px] border-[#1A1A1A] bg-[#1A1A1A] shadow-[0_40px_80px_-28px_rgba(26,26,26,0.35)]">
+                <div className="relative aspect-[9/19.5] overflow-hidden rounded-[2.25rem] bg-[#FDFCFA]">
+                  <div className="absolute left-1/2 top-2.5 z-10 h-6 w-24 -translate-x-1/2 rounded-full bg-[#1A1A1A]" />
 
-          {/* Card C — Mindset / Builder Quote */}
-          <Bento className="flex h-full flex-col justify-between bg-[#EFF5F0] border-[#DCE8DE]">
-            <div>
-              <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#5E7A63]">
-                The mindset
-              </span>
-              <p className="mt-4 font-serif text-xl italic leading-snug text-[#1C1C1E] sm:text-[1.35rem]">
-                &ldquo;When a process is slow or manual, you don&rsquo;t open a ticket. You build
-                the script that kills it.&rdquo;
-              </p>
-            </div>
-            <div className="mt-6 flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-white/60 px-3 py-1.5 text-xs font-medium text-[#8A8578] line-through decoration-[#C9C3B4]">
-                Manual: 8h/week lost
-              </span>
-              <span className="text-xs text-[#9C9686]">vs</span>
-              <span className="rounded-full bg-[#5E7A63] px-3 py-1.5 text-xs font-medium text-white">
-                Agent: 0 manual triage
-              </span>
-            </div>
-          </Bento>
+                  <div className="flex h-full flex-col px-4 pb-6 pt-10">
+                    <div className="flex min-h-[34px] items-center gap-2 text-[11px] font-medium text-[#6B6558]">
+                      {phase === "polling" && (
+                        <>
+                          <span className="relative flex h-1.5 w-1.5">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />
+                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          </span>
+                          Agent running &middot; Polling career pages...
+                        </>
+                      )}
+                      {phase === "evaluating" && (
+                        <div className="w-full">
+                          <p className="mb-1.5">Matching against criteria...</p>
+                          <div className="h-0.5 w-full overflow-hidden rounded-full bg-[#EAE5DA]">
+                            <motion.div
+                              key={runToken}
+                              className="h-full rounded-full bg-[#8C7FB0]"
+                              initial={{ width: "0%" }}
+                              animate={{ width: "100%" }}
+                              transition={{ duration: 1.05, ease: "easeInOut" }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {phase === "done" && (
+                        <span className="text-[#7A8F72]">&#10003; 3 matches found</span>
+                      )}
+                    </div>
 
-          {/* Card D — Metrics & Impact */}
-          <Bento className="bg-[#FDF1EC] border-[#F6DDD3]">
-            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#B0714E]">
-              Metrics &amp; impact
-            </span>
-            <motion.div
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.5 }}
-              variants={metricsContainer}
-              className="mt-5 space-y-4"
-            >
-              {METRICS.map((m) => (
-                <motion.div key={m.label} variants={metricItem} className="flex items-baseline gap-3">
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: m.dot }} />
-                  <span className="font-serif text-2xl text-[#1C1C1E]">{m.value}</span>
-                  <span className="text-xs text-[#8A6650]">{m.label}</span>
-                </motion.div>
-              ))}
-            </motion.div>
-          </Bento>
-
-          {/* Card E — Live Architecture Stream */}
-          <Bento className="bg-[#EFF4F9] border-[#DBE6F2]">
-            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#4F6E94]">
-              Live architecture
-            </span>
-            <div className="mt-5">
-              {PIPELINE.map((step, i) => (
-                <div key={step.title} className="relative flex gap-3 pb-6 last:pb-0">
-                  {i < PIPELINE.length - 1 && (
-                    <span className="absolute left-[5px] top-3 h-full w-px bg-[#C9D8E8]" />
-                  )}
-                  <span className="relative z-10 mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#4F6E94]" />
-                  <div>
-                    <p className="text-sm font-semibold text-[#1C1C1E]">{step.title}</p>
-                    <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-[#7C93AC]">
-                      {step.tag}
-                    </p>
-                    <p className="mt-1.5 text-xs leading-relaxed text-[#6B7C8F]">{step.caption}</p>
+                    <div className="mt-2 flex-1 space-y-2">
+                      {NOTIFICATIONS.slice(0, visibleCount).map((n, idx) => (
+                        <motion.div
+                          key={`${runToken}-${idx}`}
+                          initial={{ opacity: 0, y: -14 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ type: "spring", stiffness: 260, damping: 22 }}
+                          className="rounded-2xl border border-[#EAE5DA] bg-white/95 p-3 shadow-[0_8px_20px_-10px_rgba(26,26,26,0.18)]"
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#2AABEE]">
+                              <Send className="h-2 w-2 text-white" />
+                            </span>
+                            <span className="text-[9px] font-semibold uppercase tracking-wide text-[#A39C8C]">
+                              Telegram
+                            </span>
+                          </div>
+                          <p className="mt-1.5 text-[12px] font-semibold leading-snug text-[#1A1A1A]">
+                            {n.icon} {n.text}
+                          </p>
+                          {n.sub && <p className="mt-0.5 text-[10px] text-[#8A8578]">{n.sub}</p>}
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          </Bento>
 
-          {/* Row 3 — Footer Banner */}
-          <Bento className="flex flex-col items-start justify-between gap-4 bg-[#1C1C1E] border-[#1C1C1E] sm:flex-row sm:items-center md:col-span-3">
-            <p className="text-sm text-[#F9F9F8]">
-              Built by <span className="font-semibold">Tal Caciularu</span> — bridging operations,
-              data, and design.
-            </p>
+            <button
+              onClick={runSimulation}
+              className="mt-7 inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] bg-white px-5 py-2.5 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-[#1A1A1A]/25"
+            >
+              Re-run Agent Simulation
+              <span aria-hidden>⚡</span>
+            </button>
+          </div>
+        </section>
+
+        {/* The Mindset */}
+        <section className="border-t border-[#EAE5DA] py-20 lg:py-28">
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#B5714B]">
+            The mindset
+          </p>
+          <h2 className="mt-3 max-w-xl font-serif text-2xl font-semibold leading-snug text-[#1A1A1A] sm:text-3xl">
+            Why I built it instead of living with it.
+          </h2>
+
+          <div className="mt-12 grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl border border-[#E8D8C0] bg-[#F3E8DA] p-8">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-[#8A6A47]">
+                The Friction
+              </h3>
+              <ul className="mt-5 space-y-4">
+                {FRICTION.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#5C4A38]">
+                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#B5714B]" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-3xl border border-[#D9E5D2] bg-[#EEF3EA] p-8">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-[#4C6A45]">
+                The Builder Solution
+              </h3>
+              <ul className="mt-5 space-y-4">
+                {SOLUTION.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#374A32]">
+                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#7A8F72]" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Workflow Architecture */}
+        <section id="architecture" className="scroll-mt-16 border-t border-[#EAE5DA] py-20 lg:py-28">
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#8C7FB0]">
+            The workflow architecture
+          </p>
+          <h2 className="mt-3 max-w-xl font-serif text-2xl font-semibold leading-snug text-[#1A1A1A] sm:text-3xl">
+            Three quiet steps, running on their own.
+          </h2>
+
+          <div className="mt-14 grid gap-10 lg:grid-cols-3 lg:gap-0">
+            {STEPS.map((step, i) => (
+              <div
+                key={step.n}
+                className={`pt-8 lg:pt-0 ${
+                  i > 0 ? "border-t border-[#EAE5DA] lg:border-l lg:border-t-0 lg:pl-12" : ""
+                }`}
+              >
+                <span
+                  className="font-serif text-4xl font-light lg:text-5xl"
+                  style={{ color: step.color }}
+                >
+                  {step.n}
+                </span>
+                <h3 className="mt-4 text-base font-semibold text-[#1A1A1A]">{step.title}</h3>
+                <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-[#5C574C]">
+                  {step.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Impact & Builder Signature */}
+        <section className="border-t border-[#EAE5DA] py-20 lg:py-28">
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#B5714B]">
+            Impact &amp; builder signature
+          </p>
+
+          <div className="mt-10 grid gap-8 divide-y divide-[#EAE5DA] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            {METRICS.map((m) => (
+              <div key={m.label} className="pt-6 sm:pt-0 sm:first:pl-0 sm:pl-8">
+                <p className="font-serif text-4xl font-semibold text-[#1A1A1A]">{m.value}</p>
+                <p className="mt-2 text-sm text-[#6B6558]">{m.label}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-14 max-w-2xl font-serif text-xl font-normal leading-relaxed text-[#1A1A1A] sm:text-2xl">
+            I build tools when something feels slower than it should be.
+          </p>
+          <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-[#5C574C]">
+            This project paired data rigor with a bit of design taste: a scraper that never
+            sleeps, a scoring layer that thinks in structured criteria, and a delivery mechanism
+            built for zero friction — end to end, fast, and considered down to the notification
+            copy.
+          </p>
+
+          <div className="mt-9 flex flex-wrap items-center gap-3">
             <a
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-medium text-[#F9F9F8] transition-colors hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-medium text-[#FAF8F5] transition-opacity hover:opacity-85"
             >
-              View Repository
-              <ArrowUpRight className="h-3.5 w-3.5" />
+              View the Repository
+              <ArrowUpRight className="h-4 w-4" />
             </a>
-          </Bento>
-        </div>
+            <a
+              href={PROFILE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] px-5 py-3 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-[#1A1A1A]/25 hover:bg-white"
+            >
+              Let&rsquo;s Connect
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+          </div>
+        </section>
+
+        <footer className="flex flex-col gap-2 border-t border-[#EAE5DA] py-10 text-xs text-[#8A8578] sm:flex-row sm:items-center sm:justify-between">
+          <span>
+            Built by <span className="font-semibold text-[#5C574C]">Tal Caciularu</span> —
+            bridging operations, data, and design.
+          </span>
+          <a
+            href={REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#6B6558] underline decoration-[#D9D3C7] underline-offset-4 hover:text-[#1A1A1A]"
+          >
+            View source on GitHub ↗
+          </a>
+        </footer>
       </div>
     </div>
   );
