@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,17 +12,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
-  title: "CareerPulse — Job Search Alert Agent",
+  title: "Job Alert Bot — A Case Study",
   description:
-    "A LiveOps-style dashboard for a self-hosted job-search agent: scans career pages, scores listings with AI, and dispatches Telegram alerts for genuine matches.",
+    "How I turned a manual job hunt into an autonomous Python + AI pipeline that scans career pages, scores every listing, and dispatches Telegram alerts in real time.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
