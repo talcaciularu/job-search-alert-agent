@@ -24,19 +24,16 @@ const SOLUTION = [
 const STEPS = [
   {
     n: "01",
-    color: "#B5714B",
     title: "Ingestion",
     body: "Scheduled polling across career pages and job-board APIs, normalized into a single structured feed.",
   },
   {
     n: "02",
-    color: "#7A8F72",
     title: "Evaluation",
     body: "A structured prompt extracts seniority, role impact, and stack overlap, scoring fit against a defined profile.",
   },
   {
     n: "03",
-    color: "#8C7FB0",
     title: "Dispatch",
     body: "Only new, high-fidelity matches are formatted and pushed — instantly, deduplicated, never sent twice.",
   },
@@ -51,14 +48,23 @@ const METRICS = [
 const NOTIFICATIONS = [
   {
     icon: "🎯",
-    text: "96% Match — LiveOps Manager @ Highlight",
+    percent: 96,
+    role: "LiveOps Manager @ Highlight",
     sub: "Highlighting in-game economy & live events",
   },
-  { icon: "✨", text: "89% Match — Product & Operations Specialist", sub: null },
-  { icon: "📌", text: "84% Match — Data & Workflow Specialist", sub: null },
+  { icon: "✨", percent: 89, role: "Product & Operations Specialist", sub: null },
+  { icon: "📌", percent: 84, role: "Data & Workflow Specialist", sub: null },
 ] as const;
 
 type Phase = "polling" | "evaluating" | "done";
+
+function Eyebrow({ children }: { children: string }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-purple-200/60 bg-purple-50 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-purple-900">
+      {children}
+    </span>
+  );
+}
 
 export default function Home() {
   const [runToken, setRunToken] = useState(0);
@@ -87,27 +93,25 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] font-sans text-[#1A1A1A]">
-      <div className="mx-auto max-w-7xl px-8 py-10 lg:px-12">
+      <div className="mx-auto max-w-7xl px-8 py-8 lg:px-12">
         {/* Hero */}
-        <section className="grid gap-16 pb-24 pt-10 lg:grid-cols-2 lg:items-center lg:pb-32 lg:pt-16">
+        <section className="grid gap-10 pb-10 pt-4 lg:grid-cols-2 lg:items-center lg:gap-16 lg:pb-14 lg:pt-6">
           {/* Left: story */}
           <div>
-            <span className="inline-flex items-center rounded-full border border-[#E5DFD3] px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-[#8A8578]">
-              Project Case Study &middot; Autonomous Workflows
-            </span>
+            <Eyebrow>Project Case Study &middot; Autonomous Workflows</Eyebrow>
 
-            <h1 className="mt-7 font-serif text-4xl font-semibold leading-[1.12] tracking-tight text-[#1A1A1A] sm:text-5xl md:text-[3.25rem]">
+            <h1 className="mt-6 font-serif text-4xl font-semibold leading-[1.12] tracking-tight text-[#1A1A1A] sm:text-5xl md:text-[3.25rem]">
               Turning a manual hunt into an automated pipeline.
             </h1>
 
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#5C574C]">
+            <p className="mt-5 max-w-lg text-lg leading-relaxed text-[#5C574C]">
               Job boards are noisy, repetitive, and built for endless scrolling — not for finding
               the one role that actually fits. So I replaced the scrolling with a Python &amp; AI
               agent that watches the listings, scores every one against a defined bar, and pings
               me only when something genuinely clears it.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-6">
+            <div className="mt-8 flex flex-wrap items-center gap-6">
               <a
                 href={REPO_URL}
                 target="_blank"
@@ -139,8 +143,8 @@ export default function Home() {
                       {phase === "polling" && (
                         <>
                           <span className="relative flex h-1.5 w-1.5">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />
-                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-purple-400 opacity-70" />
+                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-purple-400" />
                           </span>
                           Agent running &middot; Polling career pages...
                         </>
@@ -151,7 +155,7 @@ export default function Home() {
                           <div className="h-0.5 w-full overflow-hidden rounded-full bg-[#EAE5DA]">
                             <motion.div
                               key={runToken}
-                              className="h-full rounded-full bg-[#8C7FB0]"
+                              className="h-full rounded-full bg-purple-400"
                               initial={{ width: "0%" }}
                               animate={{ width: "100%" }}
                               transition={{ duration: 1.05, ease: "easeInOut" }}
@@ -160,7 +164,7 @@ export default function Home() {
                         </div>
                       )}
                       {phase === "done" && (
-                        <span className="text-[#7A8F72]">&#10003; 3 matches found</span>
+                        <span className="text-purple-700">&#10003; 3 matches found</span>
                       )}
                     </div>
 
@@ -181,10 +185,19 @@ export default function Home() {
                               Telegram
                             </span>
                           </div>
-                          <p className="mt-1.5 text-[12px] font-semibold leading-snug text-[#1A1A1A]">
-                            {n.icon} {n.text}
-                          </p>
-                          {n.sub && <p className="mt-0.5 text-[10px] text-[#8A8578]">{n.sub}</p>}
+                          <div className="mt-1.5 flex items-center gap-1.5">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-800">
+                              {n.icon} {n.percent}%
+                            </span>
+                            <span className="text-[11px] font-semibold leading-snug text-[#1A1A1A]">
+                              {n.role}
+                            </span>
+                          </div>
+                          {n.sub && (
+                            <span className="mt-1 inline-flex rounded-full bg-purple-50 px-2 py-0.5 text-[9px] font-medium text-purple-700">
+                              {n.sub}
+                            </span>
+                          )}
                         </motion.div>
                       ))}
                     </div>
@@ -195,7 +208,7 @@ export default function Home() {
 
             <button
               onClick={runSimulation}
-              className="mt-7 inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] bg-white px-5 py-2.5 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-[#1A1A1A]/25"
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] bg-white px-5 py-2.5 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-purple-200 hover:bg-purple-50 hover:text-purple-900"
             >
               Re-run Agent Simulation
               <span aria-hidden>⚡</span>
@@ -204,36 +217,34 @@ export default function Home() {
         </section>
 
         {/* The Mindset */}
-        <section className="border-t border-[#EAE5DA] py-20 lg:py-28">
-          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#B5714B]">
-            The mindset
-          </p>
-          <h2 className="mt-3 max-w-xl font-serif text-2xl font-semibold leading-snug text-[#1A1A1A] sm:text-3xl">
+        <section className="border-t border-[#EAE5DA] py-8 lg:py-10">
+          <Eyebrow>The mindset</Eyebrow>
+          <h2 className="mt-2 max-w-xl font-serif text-2xl font-semibold leading-snug text-[#1A1A1A] sm:text-3xl">
             Why I built it instead of living with it.
           </h2>
 
-          <div className="mt-12 grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl border border-[#E8D8C0] bg-[#F3E8DA] p-8">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-[#8A6A47]">
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl border border-[#E5E1D8] bg-[#F5F3EF] p-8">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-[#6B6558]">
                 The Friction
               </h3>
-              <ul className="mt-5 space-y-4">
+              <ul className="mt-4 space-y-3">
                 {FRICTION.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#5C4A38]">
-                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#B5714B]" />
+                  <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#5C574C]">
+                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-purple-300" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-3xl border border-[#D9E5D2] bg-[#EEF3EA] p-8">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-[#4C6A45]">
+            <div className="rounded-3xl border border-purple-200 bg-purple-50/30 p-8 shadow-[0_0_0_1px_rgba(196,181,253,0.15),0_20px_36px_-24px_rgba(139,92,246,0.25)]">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-purple-700">
                 The Builder Solution
               </h3>
-              <ul className="mt-5 space-y-4">
+              <ul className="mt-4 space-y-3">
                 {SOLUTION.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#374A32]">
-                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#7A8F72]" />
+                  <li key={item} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#5C574C]">
+                    <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-purple-300" />
                     {item}
                   </li>
                 ))}
@@ -243,30 +254,25 @@ export default function Home() {
         </section>
 
         {/* Workflow Architecture */}
-        <section id="architecture" className="scroll-mt-16 border-t border-[#EAE5DA] py-20 lg:py-28">
-          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#8C7FB0]">
-            The workflow architecture
-          </p>
-          <h2 className="mt-3 max-w-xl font-serif text-2xl font-semibold leading-snug text-[#1A1A1A] sm:text-3xl">
+        <section id="architecture" className="scroll-mt-16 border-t border-[#EAE5DA] py-8 lg:py-10">
+          <Eyebrow>The workflow architecture</Eyebrow>
+          <h2 className="mt-2 max-w-xl font-serif text-2xl font-semibold leading-snug text-[#1A1A1A] sm:text-3xl">
             Three quiet steps, running on their own.
           </h2>
 
-          <div className="mt-14 grid gap-10 lg:grid-cols-3 lg:gap-0">
+          <div className="mt-6 grid gap-8 lg:grid-cols-3 lg:gap-0">
             {STEPS.map((step, i) => (
               <div
                 key={step.n}
-                className={`pt-8 lg:pt-0 ${
+                className={`pt-6 lg:pt-0 ${
                   i > 0 ? "border-t border-[#EAE5DA] lg:border-l lg:border-t-0 lg:pl-12" : ""
                 }`}
               >
-                <span
-                  className="font-serif text-4xl font-light lg:text-5xl"
-                  style={{ color: step.color }}
-                >
+                <span className="font-serif text-4xl font-light text-purple-300 lg:text-5xl">
                   {step.n}
                 </span>
-                <h3 className="mt-4 text-base font-semibold text-[#1A1A1A]">{step.title}</h3>
-                <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-[#5C574C]">
+                <h3 className="mt-3 text-base font-semibold text-[#1A1A1A]">{step.title}</h3>
+                <p className="mt-2 max-w-sm text-[15px] leading-relaxed text-[#5C574C]">
                   {step.body}
                 </p>
               </div>
@@ -275,31 +281,29 @@ export default function Home() {
         </section>
 
         {/* Impact & Builder Signature */}
-        <section className="border-t border-[#EAE5DA] py-20 lg:py-28">
-          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#B5714B]">
-            Impact &amp; builder signature
-          </p>
+        <section className="border-t border-[#EAE5DA] py-8 lg:py-10">
+          <Eyebrow>Impact &amp; builder signature</Eyebrow>
 
-          <div className="mt-10 grid gap-8 divide-y divide-[#EAE5DA] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div className="mt-6 grid gap-6 divide-y divide-[#EAE5DA] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
             {METRICS.map((m) => (
-              <div key={m.label} className="pt-6 sm:pt-0 sm:first:pl-0 sm:pl-8">
+              <div key={m.label} className="pt-4 sm:pt-0 sm:first:pl-0 sm:pl-8">
                 <p className="font-serif text-4xl font-semibold text-[#1A1A1A]">{m.value}</p>
-                <p className="mt-2 text-sm text-[#6B6558]">{m.label}</p>
+                <p className="mt-1.5 text-sm text-[#6B6558]">{m.label}</p>
               </div>
             ))}
           </div>
 
-          <p className="mt-14 max-w-2xl font-serif text-xl font-normal leading-relaxed text-[#1A1A1A] sm:text-2xl">
+          <p className="mt-8 max-w-2xl font-serif text-xl font-normal leading-relaxed text-[#1A1A1A] sm:text-2xl">
             I build tools when something feels slower than it should be.
           </p>
-          <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-[#5C574C]">
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#5C574C]">
             This project paired data rigor with a bit of design taste: a scraper that never
             sleeps, a scoring layer that thinks in structured criteria, and a delivery mechanism
             built for zero friction — end to end, fast, and considered down to the notification
             copy.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <a
               href={REPO_URL}
               target="_blank"
@@ -313,7 +317,7 @@ export default function Home() {
               href={PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] px-5 py-3 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-[#1A1A1A]/25 hover:bg-white"
+              className="inline-flex items-center gap-2 rounded-full border border-[#E5DFD3] px-5 py-3 text-sm font-medium text-[#1A1A1A] transition-colors hover:border-purple-200 hover:bg-purple-50 hover:text-purple-900"
             >
               Let&rsquo;s Connect
               <ArrowUpRight className="h-4 w-4" />
@@ -321,7 +325,7 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="flex flex-col gap-2 border-t border-[#EAE5DA] py-10 text-xs text-[#8A8578] sm:flex-row sm:items-center sm:justify-between">
+        <footer className="flex flex-col gap-2 border-t border-[#EAE5DA] py-6 text-xs text-[#8A8578] sm:flex-row sm:items-center sm:justify-between">
           <span>
             Built by <span className="font-semibold text-[#5C574C]">Tal Caciularu</span> —
             bridging operations, data, and design.
